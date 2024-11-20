@@ -1,52 +1,46 @@
-FROM python:3.12-slim
+ARG PYTHON_VERSION=3.12-slim-bookworm
 
-ARG DEBIAN_FRONTEND=noninteractive
+FROM python:${PYTHON_VERSION}
 
-RUN apt-get update && apt-get -y upgrade \
-    && apt-get install --no-install-recommends -y \
-        gcc \
-        g++ \
-        locales \
-        curl \
-        xz-utils \
-        ca-certificates \
-        openssl \
-        make \
-        git \
-        pkg-config \
-    && curl -o /usr/local/share/ca-certificates/ca_bundle.crt https://storage.botifyme.dev/apps/nats/ca_bundle.crt \
-    && chmod 644 /usr/local/share/ca-certificates/ca_bundle.crt \
-    && update-ca-certificates \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /usr/share/doc/* \
-    && rm -rf /usr/share/man/*
+LABEL maintainer="AgentifyMe <info@agentifyme.ai>, @arunreddy"
+LABEL description="Docker image for executing python functions using AgentifyMe CLI"
+LABEL org.opencontainers.image.source="https://github.com/agentifyme/agentifyme-py"
+LABEL version=0.1.0
 
-  
-# Install uv and set up Python dependencies in one layer
-WORKDIR /usr/src/app
-COPY requirements.lock pyproject.toml README.md ./
-RUN pip install uv \
-    && uv pip install --system -r requirements.lock \
-    && uv pip install --system -U agentifyme
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Start of Selection
-ARG AGENTIFYME_PYTHON_WORKER_VERSION
-ARG AGENTIFYME_WORKER_VERSION
-ENV AGENTIFYME_WORKER_VERSION=${AGENTIFYME_WORKER_VERSION} \
-  AGENTIFYME_PYTHON_WORKER_VERSION=${AGENTIFYME_PYTHON_WORKER_VERSION}
+# Install runtime packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    iproute2 \
+    iputils-ping \
+    dnsutils \
+    git \
+    curl \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN if [ ! -z "${AGENTIFYME_PYTHON_WORKER_VERSION}" ]; then \
-    curl -L https://agentifyme.ai/install-py-worker.sh | bash \
-    fi \
-    && if [ ! -z "${AGENTIFYME_WORKER_VERSION}" ]; then \
-    curl -L https://agentifyme.ai/install-worker.sh | bash \
-    fi
+# Create a non-root user
+RUN useradd -m -s /bin/bash agnt5
 
+# Install Rye for the non-root userd
+USER agnt5
 
-COPY src/ ./src
-COPY prompts/ ./prompts
-COPY agentifyme.yml ./
-COPY .agentifyme/project.app ./.agentifyme/project.app 
+# Set working directory
+WORKDIR /home/agnt5/app
+RUN curl -LsSf https://astral.sh/uv/install.sh | bash
 
-CMD ["/usr/local/bin/agentifyme-worker"]
+ENV PATH="${PATH}:/home/agnt5/.cargo/bin:/usr/local/bin:/home/agnt5/.local/bin:/home/agnt5/app/.venv/bin"
+
+RUN uv venv
+RUN uv pip install agentifyme~=0.1.2
+
+COPY requirements.lock .
+RUN uv pip install -r requirements.lock
+
+COPY src src
+
+CMD ["/home/agnt5/app/.venv/bin/agnt5"]
