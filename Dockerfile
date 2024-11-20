@@ -38,6 +38,8 @@ ENV PATH="${PATH}:/home/agnt5/.cargo/bin:/usr/local/bin:/home/agnt5/.local/bin:/
 RUN uv venv
 RUN uv pip install agentifyme~=0.1.2
 
+COPY README.md .
+COPY pyproject.toml .
 COPY requirements.lock .
 RUN uv pip install -r requirements.lock
 
