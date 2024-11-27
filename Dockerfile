@@ -26,23 +26,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create a non-root user
 RUN useradd -m -s /bin/bash agnt5
 
-# Install Rye for the non-root userd
-USER agnt5
-
 # Set working directory
 WORKDIR /home/agnt5/app
+RUN chown agnt5:agnt5 /home/agnt5/app
+
+USER agnt5
+
+# Install Rye for the non-root userd
 RUN curl -LsSf https://astral.sh/uv/install.sh | bash
 
 ENV PATH="${PATH}:/home/agnt5/.cargo/bin:/usr/local/bin:/home/agnt5/.local/bin:/home/agnt5/app/.venv/bin"
 
 RUN uv venv
-RUN uv pip install agentifyme~=0.1.2
+RUN uv pip install agentifyme~=0.1.5
 
-COPY README.md .
-COPY pyproject.toml .
-COPY requirements.lock .
+COPY --chown=agnt5:agnt5  README.md .
+COPY --chown=agnt5:agnt5  pyproject.toml .
+COPY --chown=agnt5:agnt5  requirements.lock .
 RUN uv pip install -r requirements.lock
 
-COPY src src
+COPY --chown=agnt5:agnt5  src src
+COPY --chown=agnt5:agnt5 agentifyme.yml .
 
 CMD ["/home/agnt5/app/.venv/bin/agnt5"]
