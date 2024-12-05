@@ -10,7 +10,7 @@
 #   universal: false
 
 -e file:.
-agentifyme==0.1.13
+agentifyme==0.1.15
     # via workflow-quickstart-py
 aiohappyeyeballs==2.4.3
     # via aiohttp

@@ -1,56 +1,91 @@
 from agentifyme import task, workflow
 from loguru import logger
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # Data Models
 class CoffeeOrder(BaseModel):
-    order_id: str
-    customer_id: str
-    drink_type: str
-    size: str
-    extras: list[str] = []
+    """
+    Represents a coffee order placed by a customer.
+    """
+
+    order_id: str = Field(description="Unique identifier for the order.")
+    customer_id: str = Field(description="Unique identifier for the customer placing the order.")
+    drink_type: str = Field(description="Type of drink ordered (e.g., latte, cappuccino).")
+    size: str = Field(description="Size of the drink (e.g., small, medium, large).")
+    extras: list[str] = Field(description="List of additional items requested for the drink.", default=[])
 
 
 class OrderPrice(BaseModel):
-    order_id: str
-    base_price: float
-    extras_cost: float
-    loyalty_discount: float
-    final_total: float
+    """
+    Represents the price information for a coffee order.
+    """
+
+    order_id: str = Field(description="Unique identifier for the order.")
+    base_price: float = Field(description="Base price of the drink.")
+    extras_cost: float = Field(description="Cost of additional items requested for the drink.")
+    loyalty_discount: float = Field(description="Discount applied due to loyalty tier.")
+    final_total: float = Field(description="Final total price after applying discounts.")
 
 
 class InventoryItem(BaseModel):
-    item_id: str
-    name: str
-    quantity: int
-    low_stock_threshold: int
+    """
+    Represents an item in the inventory.
+    """
+
+    item_id: str = Field(description="Unique identifier for the item.")
+    name: str = Field(description="Name of the item.")
+    quantity: int = Field(description="Current quantity of the item in stock.")
+    low_stock_threshold: int = Field(description="Threshold quantity below which low stock alert is triggered.")
 
 
 class InventoryUpdate(BaseModel):
-    items_used: list[tuple[str, int]]
-    restock_needed: list[str]
+    """
+    Represents the update to the inventory after processing an order.
+    """
+
+    items_used: list[tuple[str, int]] = Field(description="List of items used in the order and their quantities.")
+    restock_needed: list[str] = Field(description="List of items that need to be restocked.")
 
 
 class LoyaltyPoints(BaseModel):
-    customer_id: str
-    points_earned: int
-    total_points: int
-    current_tier: str
+    """
+    Represents the loyalty points information for a customer.
+    """
+
+    customer_id: str = Field(description="Unique identifier for the customer.")
+    points_earned: int = Field(description="Points earned by the customer for the order.")
+    total_points: int = Field(description="Total points accumulated by the customer.")
+    current_tier: str = Field(description="Current loyalty tier of the customer.")
 
 
 class OrderSummary(BaseModel):
-    order_id: str
-    price_info: OrderPrice
-    loyalty_info: LoyaltyPoints
-    inventory_status: str
-    status: str
-    estimated_wait: int
+    """
+    Represents the summary of a coffee order.
+    """
+
+    order_id: str = Field(description="Unique identifier for the order.")
+    price_info: OrderPrice = Field(description="Price information for the order.")
+    loyalty_info: LoyaltyPoints = Field(description="Loyalty points information for the order.")
+    inventory_status: str = Field(description="Status of the inventory after processing the order.")
+    status: str = Field(description="Status of the order after processing.")
+    estimated_wait: int = Field(description="Estimated wait time for the order to be prepared.")
 
 
 # Tasks - All synchronous now
 @task(name="Calculate Order Price")
 def calculate_order_price(order: CoffeeOrder, loyalty_tier: str) -> OrderPrice:
+    """
+    Calculates the price of a coffee order based on the order details and loyalty tier.
+
+    Args:
+        order (CoffeeOrder): The coffee order details.
+        loyalty_tier (str): The loyalty tier of the customer.
+
+    Returns:
+        OrderPrice: The price information for the order.
+    """
+
     base_prices = {"small": 3.50, "medium": 4.00, "large": 4.50}
     drink_markups = {"latte": 1.00, "cappuccino": 1.00, "espresso": 0.50}
     extra_prices = {"extra_shot": 0.80, "whipped_cream": 0.50, "syrup": 0.50}
@@ -72,6 +107,16 @@ def calculate_order_price(order: CoffeeOrder, loyalty_tier: str) -> OrderPrice:
 
 @task(name="Check Inventory")
 def check_inventory(order: CoffeeOrder) -> InventoryUpdate:
+    """
+    Checks the inventory for the items required to prepare a coffee order.
+
+    Args:
+        order (CoffeeOrder): The coffee order details.
+
+    Returns:
+        InventoryUpdate: The update to the inventory after processing the order.
+    """
+
     # Simulate inventory check
     items_used = [
         ("coffee_beans", 20),
@@ -91,6 +136,17 @@ def check_inventory(order: CoffeeOrder) -> InventoryUpdate:
 
 @task(name="Calculate Loyalty")
 def calculate_loyalty_points(order_price: float, customer_id: str) -> LoyaltyPoints:
+    """
+    Calculates the loyalty points earned by a customer based on the order price.
+
+    Args:
+        order_price (float): The total price of the order.
+        customer_id (str): The unique identifier for the customer.
+
+    Returns:
+        LoyaltyPoints: The loyalty points information for the order.
+    """
+
     points_earned = int(order_price)
     mock_current_points = 100
     total_points = mock_current_points + points_earned
@@ -112,6 +168,16 @@ def calculate_loyalty_points(order_price: float, customer_id: str) -> LoyaltyPoi
 # Workflows
 @workflow(name="Process Pricing")
 def process_pricing(order: CoffeeOrder) -> tuple[OrderPrice, LoyaltyPoints]:
+    """
+    Processes the pricing for a coffee order.
+
+    Args:
+        order (CoffeeOrder): The coffee order details.
+
+    Returns:
+        tuple[OrderPrice, LoyaltyPoints]: The price information and loyalty points information for the order.
+    """
+
     initial_loyalty = calculate_loyalty_points(0, order.customer_id)
     price_info = calculate_order_price(order, initial_loyalty.current_tier)
     final_loyalty = calculate_loyalty_points(price_info.final_total, order.customer_id)
@@ -120,6 +186,16 @@ def process_pricing(order: CoffeeOrder) -> tuple[OrderPrice, LoyaltyPoints]:
 
 @workflow(name="Process Inventory")
 def process_inventory(order: CoffeeOrder) -> InventoryUpdate:
+    """
+    Processes the inventory for a coffee order.
+
+    Args:
+        order (CoffeeOrder): The coffee order details.
+
+    Returns:
+        InventoryUpdate: The update to the inventory after processing the order.
+    """
+
     inventory_update = check_inventory(order)
     if inventory_update.restock_needed:
         logger.warning(f"Low stock alert for items: {inventory_update.restock_needed}")
@@ -128,6 +204,16 @@ def process_inventory(order: CoffeeOrder) -> InventoryUpdate:
 
 @workflow(name="Process Order")
 def process_order(order: CoffeeOrder) -> OrderSummary:
+    """
+    Processes the entire order workflow.
+
+    Args:
+        order (CoffeeOrder): The coffee order details.
+
+    Returns:
+        OrderSummary: The summary of the order after processing.
+    """
+
     try:
         # Process pricing
         price_info, loyalty_info = process_pricing(order)
@@ -138,6 +224,7 @@ def process_order(order: CoffeeOrder) -> OrderSummary:
         inventory_status = "READY_TO_PREPARE" if not inventory_update.restock_needed else "WARNING_LOW_STOCK"
 
         base_wait = 5
+        logger.info(f"{order} , {type(order)}")
         extra_wait = len(order.extras) * 1
 
         return OrderSummary(

@@ -1,7 +1,7 @@
 [project]
 name = "workflow-quickstart-py"
-version = "0.1.3"
-description = "Add your description here"
+version = "0.1.4"
+description = "A quickstart project for building workflows with AgentifyMe"
 authors = [
     { name = "Arun Reddy", email = "arunreddy.nelakurthi@gmail.com" }
 ]
@@ -25,4 +25,4 @@ dev-dependencies = []
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/simple_workflow"]
+packages = ["src/coffee_shop"]
