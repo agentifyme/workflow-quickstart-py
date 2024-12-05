@@ -6,7 +6,7 @@ authors = [
     { name = "Arun Reddy", email = "arunreddy.nelakurthi@gmail.com" }
 ]
 dependencies = [
-    "agentifyme~=0.1.13",
+    "agentifyme~=0.1.14",
     "pydantic>=2.9.2",
     "numpy~=2.1.3",
 ]
