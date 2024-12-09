@@ -38,7 +38,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | bash
 ENV PATH="${PATH}:/home/agnt5/.cargo/bin:/usr/local/bin:/home/agnt5/.local/bin:/home/agnt5/app/.venv/bin"
 
 RUN uv venv
-RUN uv pip install agentifyme~=0.1.15
+RUN uv pip install agentifyme~=0.1.16
 
 COPY --chown=agnt5:agnt5  README.md .
 COPY --chown=agnt5:agnt5  pyproject.toml .
