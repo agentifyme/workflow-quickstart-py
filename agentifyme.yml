@@ -1,0 +1,3 @@
+name: local-travel-planner
+language: python
+version: "3.12"

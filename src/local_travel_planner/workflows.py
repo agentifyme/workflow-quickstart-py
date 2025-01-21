@@ -1,5 +1,6 @@
 import asyncio
 import os
+import random
 
 import openai
 from agentifyme import task, workflow
@@ -14,6 +15,9 @@ load_dotenv()
 
 MODEL = "gpt-4o-mini"
 
+
+class MyWorkflowError(Exception):
+    pass
 
 def generate_itinerary(wiki_info, reddit_posts, weather_info, destination):
     """
@@ -79,6 +83,22 @@ def generate_itinerary(wiki_info, reddit_posts, weather_info, destination):
     except Exception as e:
         logger.error(f"Error generating itinerary: {e}")
         return None
+
+
+@workflow(name="get-weather", description="Get weather forecast for a given destination and number of days")
+async def get_weather(destination: str, days: int) -> dict:
+    lat, lon = await get_geo_coordinates(destination)
+    if not lat or not lon:
+        logger.error("Could not retrieve geographical coordinates. Exiting.")
+        return
+    logger.info(f"Geographical coordinates retrieved - latitude: {lat}, longitude: {lon}.\n")
+
+    weather_info, weather_raw = await get_weather_forecast(lat, lon, days)
+    if not weather_info:
+        logger.error("Could not retrieve weather information. Exiting.")
+        return
+
+    return {"weather_info": weather_info}
 
 
 @workflow(name="generate-travel-plan", description="Generate a travel plan for a given location and number of days")
@@ -168,7 +188,6 @@ async def generate_travel_plan(destination: str, days: int) -> dict:
         "days": days,
         "itinerary": itinerary,
     }
-
 
 def main():
     asyncio.run(generate_travel_plan(destination="Phoenix, Arizona", days=3))

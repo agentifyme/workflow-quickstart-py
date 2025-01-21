@@ -26,6 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create a non-root user
 RUN useradd -m -s /bin/bash agnt5
 
+RUN curl -L -o /usr/local/bin/agnt5-init https://storage.botifyme.dev/init/latest/agnt5-init-linux-arm64
+RUN chmod +x /usr/local/bin/agnt5-init
+
 # Set working directory
 WORKDIR /home/agnt5/app
 RUN chown agnt5:agnt5 /home/agnt5/app
@@ -38,7 +41,6 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | bash
 ENV PATH="${PATH}:/home/agnt5/.cargo/bin:/usr/local/bin:/home/agnt5/.local/bin:/home/agnt5/app/.venv/bin"
 
 RUN uv venv
-RUN uv pip install agentifyme~=0.1.16
 
 COPY --chown=agnt5:agnt5  README.md .
 COPY --chown=agnt5:agnt5  pyproject.toml .
@@ -48,4 +50,5 @@ RUN uv pip install -r requirements.lock
 COPY --chown=agnt5:agnt5  src src
 COPY --chown=agnt5:agnt5 agentifyme.yml .
 
+ENTRYPOINT ["/usr/local/bin/agnt5-init"]
 CMD ["/home/agnt5/app/.venv/bin/agnt5"]
