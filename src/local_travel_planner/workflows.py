@@ -3,7 +3,7 @@ import os
 import random
 
 import openai
-from agentifyme import task, workflow
+from agentifyme import AgentifyMeError, ErrorCategory, ErrorSeverity, task, workflow
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from loguru import logger
@@ -18,6 +18,7 @@ MODEL = "gpt-4o-mini"
 
 class MyWorkflowError(Exception):
     pass
+
 
 def generate_itinerary(wiki_info, reddit_posts, weather_info, destination):
     """
@@ -189,8 +190,10 @@ async def generate_travel_plan(destination: str, days: int) -> dict:
         "itinerary": itinerary,
     }
 
+
 def main():
-    asyncio.run(generate_travel_plan(destination="Phoenix, Arizona", days=3))
+    # asyncio.run(generate_travel_plan(destination="Phoenix, Arizona", days=3))
+    asyncio.run(get_weather(destination="Phoenix, Arizona", days=3))
 
 
 if __name__ == "__main__":

@@ -14,11 +14,6 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install runtime packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    iproute2 \
-    iputils-ping \
-    dnsutils \
-    git \
     curl \
     ca-certificates && \
     rm -rf /var/lib/apt/lists/*
@@ -26,29 +21,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create a non-root user
 RUN useradd -m -s /bin/bash agnt5
 
-RUN curl -L -o /usr/local/bin/agnt5-init https://storage.botifyme.dev/init/latest/agnt5-init-linux-arm64
-RUN chmod +x /usr/local/bin/agnt5-init
-
 # Set working directory
 WORKDIR /home/agnt5/app
 RUN chown agnt5:agnt5 /home/agnt5/app
 
 USER agnt5
 
-# Install Rye for the non-root userd
 RUN curl -LsSf https://astral.sh/uv/install.sh | bash
+RUN curl -LsSf https://agentifyme.ai/init.sh | bash
+RUN curl -LsSf https://agentifyme.ai/cli.sh | bash
 
-ENV PATH="${PATH}:/home/agnt5/.cargo/bin:/usr/local/bin:/home/agnt5/.local/bin:/home/agnt5/app/.venv/bin"
+ENV PATH="${PATH}:/home/agnt5/.local/bin:/home/agnt5/app/.venv/bin:/home/agnt5/.agentifyme/bin"
 
 RUN uv venv
 
 COPY --chown=agnt5:agnt5  README.md .
 COPY --chown=agnt5:agnt5  pyproject.toml .
-COPY --chown=agnt5:agnt5  requirements.lock .
-RUN uv pip install -r requirements.lock
+COPY --chown=agnt5:agnt5  uv.lock .
+RUN uv sync
 
 COPY --chown=agnt5:agnt5  src src
 COPY --chown=agnt5:agnt5 agentifyme.yml .
 
-ENTRYPOINT ["/usr/local/bin/agnt5-init"]
-CMD ["/home/agnt5/app/.venv/bin/agnt5"]
+ENTRYPOINT ["agnt5-init"]
+CMD ["agnt5"]

@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    entrypoint: ["sh", "-c"]
+    command: ["agentifyme dev"]
+    ports:
+      - 63420:63418
+      - 63421:63419
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /app/src
+          ignore:
+            - .venv/
