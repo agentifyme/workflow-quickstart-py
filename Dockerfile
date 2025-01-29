@@ -14,6 +14,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install runtime packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     curl \
     ca-certificates && \
     rm -rf /var/lib/apt/lists/*
@@ -42,6 +43,8 @@ RUN uv sync
 
 COPY --chown=agnt5:agnt5  src src
 COPY --chown=agnt5:agnt5 agentifyme.yml .
+
+RUN uv add agentifyme --extra grpc --extra worker
 
 ENTRYPOINT ["agnt5-init"]
 CMD ["agnt5"]
