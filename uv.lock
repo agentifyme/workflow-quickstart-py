@@ -3,7 +3,7 @@ requires-python = ">=3.12"
 
 [[distribution]]
 name = "agentifyme"
-version = "0.1.46"
+version = "0.1.47"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
@@ -21,9 +21,9 @@ dependencies = [
     { name = "websockets" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c7/cc/fea1558b75cbb794dd8367fe38a9c9dfb744740ad6754a7cb764bc1e5a55/agentifyme-0.1.46.tar.gz", hash = "sha256:113b7eeaeb5bb67586da9cbce81f828a262a204676bcf7d8a16ca2a3fa8fddaa", size = 201895 }
+sdist = { url = "https://files.pythonhosted.org/packages/6e/2b/0b44d5f2cbc0d13bfbdee3c3bfa5a48cc3c322b5c7698a1edd42629d320b/agentifyme-0.1.47.tar.gz", hash = "sha256:90bbb0057ee6a6e827fb1723b61b5dd401a2603b9410923703e9f96b4b5d3a2f", size = 201894 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/36/b2/5964eb22f9cc55ae4563e8c6d6661065ecca74fa9db5e524c2228ed558f7/agentifyme-0.1.46-py3-none-any.whl", hash = "sha256:29853f77d463a5dc57020d4098d02ad859af52d6ce3063e7e763cc81ee6d7033", size = 99423 },
+    { url = "https://files.pythonhosted.org/packages/98/fa/f9f671963c40b9412f71fdffec05a307455fdbb7ca47c0879e0f6f2b9ed3/agentifyme-0.1.47-py3-none-any.whl", hash = "sha256:8152467d19afa3f80e131b095ddeda8cdf4f1716d6b6f7b8d03b1fc5436ca04d", size = 99424 },
 ]
 
 [[distribution]]
