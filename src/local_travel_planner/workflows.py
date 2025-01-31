@@ -182,13 +182,20 @@ async def generate_travel_plan(destination: str, days: int) -> dict:
     if not itinerary:
         logger.error("Could not generate itinerary. Exiting.")
         return
-    logger.info(f"Travel Plan for {destination} for {days} days:\n{itinerary}")
+    logger.info(f"Travel Plan for {destination} for {days} days")
 
     return {
         "destination": destination,
         "days": days,
-        "itinerary": itinerary,
+        "itinerary": itinerary[:1000],
     }
+
+
+@workflow(name="get-env", description="Get environment variables")
+async def get_env() -> dict:
+    logger.info("Getting environment variables")
+    env_vars = dict(os.environ)
+    return env_vars
 
 
 def main():

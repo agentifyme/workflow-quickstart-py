@@ -1,12 +1,12 @@
 [project]
 name = "workflow-quickstart-py"
-version = "0.1.7"
+version = "0.1.8"
 description = "A quickstart project for building workflows with AgentifyMe"
 authors = [
     { name = "Arun Reddy", email = "arunreddy.nelakurthi@gmail.com" }
 ]
 dependencies = [
-    "agentifyme>=0.1.47",
+    "agentifyme>=0.1.51",
     "pydantic>=2.9.2",
     "numpy~=2.1.3",
     "beautifulsoup4>=4.12.3",

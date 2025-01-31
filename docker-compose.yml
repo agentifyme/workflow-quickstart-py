@@ -1,11 +1,16 @@
 services:
-  app:
+  quickstart:
+    container_name: quickstart
     build: .
     entrypoint: ["sh", "-c"]
     command: ["agentifyme dev"]
+    env_file:
+      - .env
     ports:
       - 63420:63418
       - 63421:63419
+    networks:
+      - quickstart
     develop:
       watch:
         - action: sync+restart
@@ -13,3 +18,17 @@ services:
           target: /app/src
           ignore:
             - .venv/
+
+  quickstart-client:
+    container_name: quickstart-client 
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: ["sleep", "infinity"]
+    networks:
+      - quickstart
+
+
+networks:
+  quickstart:
+    driver: bridge
