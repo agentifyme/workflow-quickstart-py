@@ -1,6 +1,6 @@
 [project]
 name = "workflow-quickstart-py"
-version = "0.1.8"
+version = "0.1.9"
 description = "A quickstart project for building workflows with AgentifyMe"
 authors = [
     { name = "Arun Reddy", email = "arunreddy.nelakurthi@gmail.com" }
