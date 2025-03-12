@@ -29,8 +29,9 @@ RUN chown agnt5:agnt5 /home/agnt5/app
 USER agnt5
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | bash
-RUN curl -LsSf https://agentifyme.ai/init.sh | bash
 RUN curl -LsSf https://agentifyme.ai/cli.sh | bash
+RUN curl -LsSf "https://agentifyme.ai/init-py.sh?$(date +%s)" | bash
+
 
 ENV PATH="${PATH}:/home/agnt5/.local/bin:/home/agnt5/app/.venv/bin:/home/agnt5/.agentifyme/bin"
 
@@ -46,5 +47,4 @@ COPY --chown=agnt5:agnt5 agentifyme.yml .
 
 RUN uv add agentifyme --extra grpc --extra worker
 
-ENTRYPOINT ["agnt5-init"]
-CMD ["agnt5"]
+CMD ["/home/agnt5/.agentifyme/bin/agnt5-init"]

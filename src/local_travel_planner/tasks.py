@@ -213,7 +213,7 @@ async def get_geo_coordinates(destination: str) -> tuple[float, float]:
 
 
 @task(name="get-weather-forecast", description="Fetches a weather forecast for the next 'days' days for the given coordinates using Open-Meteo API.")
-async def get_weather_forecast(lat: float, lon: float, days: int = 3) -> str:
+async def get_weather_forecast(lat: float, lon: float, days: int = 3) -> tuple[str, dict]:
     """
     Fetches a weather forecast for the next 'days' days for the given coordinates using Open-Meteo API.
     :param lat: Latitude of the location.

@@ -2,7 +2,8 @@ services:
   quickstart:
     container_name: quickstart
     build: .
-    entrypoint: ["/home/agnt5/.agentifyme/bin/supervisor"]
+    entrypoint: ["sh", "-c"]
+    command: ["agentifyme dev"]
     env_file:
       - .env
     ports:

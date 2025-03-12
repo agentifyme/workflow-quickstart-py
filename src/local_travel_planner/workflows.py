@@ -1,6 +1,7 @@
 import asyncio
 import os
 import random
+import time
 
 import openai
 from agentifyme import AgentifyMeError, ErrorCategory, ErrorSeverity, task, workflow
@@ -86,20 +87,41 @@ def generate_itinerary(wiki_info, reddit_posts, weather_info, destination):
         return None
 
 
+# @workflow(name="get-weather", description="Get weather forecast for a given destination and number of days")
+# async def get_weather(destination: str, days: int) -> dict:
+#     lat, lon = await get_geo_coordinates(destination)
+#     if not lat or not lon:
+#         logger.error("Could not retrieve geographical coordinates. Exiting.")
+#         return
+#     logger.info(f"Geographical coordinates retrieved - latitude: {lat}, longitude: {lon}.\n")
+
+#     weather_info, weather_raw = await get_weather_forecast(lat, lon, days)
+#     if not weather_info:
+#         logger.error("Could not retrieve weather information. Exiting.")
+#         return
+
+#     return {"weather_info": weather_raw}
+
+
 @workflow(name="get-weather", description="Get weather forecast for a given destination and number of days")
-async def get_weather(destination: str, days: int) -> dict:
-    lat, lon = await get_geo_coordinates(destination)
+def get_weather(destination: str, days: int) -> dict:
+    lat, lon = asyncio.run(get_geo_coordinates(destination))
     if not lat or not lon:
         logger.error("Could not retrieve geographical coordinates. Exiting.")
         return
     logger.info(f"Geographical coordinates retrieved - latitude: {lat}, longitude: {lon}.\n")
 
-    weather_info, weather_raw = await get_weather_forecast(lat, lon, days)
+    weather_info, weather_raw = asyncio.run(get_weather_forecast(lat, lon, days))
     if not weather_info:
         logger.error("Could not retrieve weather information. Exiting.")
         return
 
-    return {"weather_info": weather_info}
+    # create a random time in milliseconds between 10 and days*1000
+    random_time = random.randint(10, days * 1000)
+    weather_raw["time"] = random_time
+    time.sleep(random_time / 1000)
+
+    return weather_raw
 
 
 @workflow(name="generate-travel-plan", description="Generate a travel plan for a given location and number of days")
@@ -176,7 +198,6 @@ async def generate_travel_plan(destination: str, days: int) -> dict:
                 logger.info(f"   Comments:\n{comments_text}\n")
             else:
                 logger.info(f"   Comments: [No comments available]\n")
-        logger.info("========================\n")
 
     itinerary = generate_itinerary(wiki_info, reddit_posts, weather_info, destination)
     if not itinerary:
