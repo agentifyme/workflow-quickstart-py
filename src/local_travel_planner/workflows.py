@@ -105,11 +105,19 @@ def generate_itinerary(wiki_info, reddit_posts, weather_info, destination):
 
 @workflow(name="get-weather", description="Get weather forecast for a given destination and number of days")
 def get_weather(destination: str, days: int) -> dict:
+    if not destination:
+        logger.error("destination cannot be empty.")
+        raise ValueError("destination cannot be empty.")
+
     lat, lon = asyncio.run(get_geo_coordinates(destination))
     if not lat or not lon:
         logger.error("Could not retrieve geographical coordinates. Exiting.")
         return
     logger.info(f"Geographical coordinates retrieved - latitude: {lat}, longitude: {lon}.\n")
+
+    if days < 0:
+        logger.error("days cannot be negative.")
+        raise ValueError("days cannot be negative.")
 
     weather_info, weather_raw = asyncio.run(get_weather_forecast(lat, lon, days))
     if not weather_info:

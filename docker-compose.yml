@@ -2,11 +2,11 @@ services:
   quickstart:
     container_name: quickstart
     build: .
-    entrypoint: ["/home/agnt5/.agentifyme/bin/supervisor"]
+    command: ["agnt5-init", "--local"]
     env_file:
       - .env
     ports:
-      - 63420:63418
+      - 63420:3000
       - 63421:63419
     networks:
       - quickstart
@@ -18,14 +18,14 @@ services:
           ignore:
             - .venv/
 
-  quickstart-client:
-    container_name: quickstart-client 
-    build:
-      context: .
-      dockerfile: Dockerfile.client
-    command: ["sleep", "infinity"]
-    networks:
-      - quickstart
+  # quickstart-client:
+  #   container_name: quickstart-client 
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.client
+  #   command: ["sleep", "infinity"]
+  #   networks:
+  #     - quickstart
 
 
 networks:
