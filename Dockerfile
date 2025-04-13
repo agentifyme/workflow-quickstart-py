@@ -1,5 +1,5 @@
 ARG RUNTIME_VERSION=0.2
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.13
 FROM ghcr.io/agentifyme/python-runtime:${RUNTIME_VERSION}-python${PYTHON_VERSION}
 
 COPY --chown=agnt5:agnt5  README.md .
